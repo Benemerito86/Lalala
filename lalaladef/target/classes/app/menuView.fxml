@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.MenuController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<Pane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
 
-    <Label fx:id="welcomeText"/>
-    <Button fx:id="playButton" text="Jugar" onAction="#handlePlay"/>
-    <Button fx:id="exitButton" text="Salir" onAction="#handleExit"/>
+    <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+        <image>
+            <Image url="@../img/menuLalala.png" />
+        </image>
+    </ImageView>
 
-</VBox>
+
+    <Label fx:id="welcomeText" />
+   <ImageView fitHeight="130.0" fitWidth="159.0" layoutX="44.0" layoutY="240.0" pickOnBounds="true" preserveRatio="true">
+      <image>
+         <Image url="@../img/botonSalir.png" />
+      </image>
+   </ImageView>
+    <Button fx:id="exitButton" layoutX="76.0" layoutY="275.0" onAction="#handleExit" opacity="0.0" prefHeight="65.0" prefWidth="90.0" text="Salir">
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor></Button>
+   <ImageView fitHeight="130.0" fitWidth="116.0" layoutX="22.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true">
+      <image>
+         <Image url="@../img/botonJugar.png" />
+      </image>
+   </ImageView>
+    <Button fx:id="playButton" layoutX="38.0" layoutY="90.0" onAction="#handlePlay" opacity="0.0" prefHeight="74.0" prefWidth="82.0" text="Jugar">
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor></Button>
+
+</Pane>
