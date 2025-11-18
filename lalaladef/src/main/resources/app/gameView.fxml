@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GameController">
+    <!-- ImageView como fondo -->
+    <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+        <image>
+            <Image url="@../img/GORROS_NIEVE2.png" />
+        </image>
+    </ImageView>
+
+    <!-- Contenido superior centrado -->
+    <VBox alignment="CENTER" spacing="20">
+        <Text fill="WHITE" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="¡Bienvenido al juego!" />
+    </VBox>
+</StackPane>
