@@ -1,19 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
 
-<StackPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GameController">
-    <!-- ImageView como fondo -->
-    <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
-        <image>
-            <Image url="@../img/PLANETA_SNIEVE.png" />
-        </image>
-    </ImageView>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.GameController"
+            fx:id="rootPane"
+            prefWidth="1920"
+            prefHeight="1080">
 
-    <!-- Contenido superior centrado -->
-    <VBox alignment="CENTER" spacing="20">
-        <Text fill="WHITE" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="¡Bienvenido al juego!" />
-    </VBox>
-</StackPane>
+    <!-- FONDO PRINCIPAL (zoom + animación) -->
+    <ImageView fx:id="fondo"
+               fitWidth="1200"
+               fitHeight="560"
+               preserveRatio="true"
+               pickOnBounds="true"
+               onMouseClicked="#clickImagen"/>
+
+    <!-- OVERLAY PARA NIÑOS (mensajes simpáticos) -->
+    <AnchorPane fx:id="overlay"
+                style="-fx-background-color: rgba(0,0,0,0.65);"
+                visible="false"
+                prefWidth="1200"
+                prefHeight="560">
+
+        <Label fx:id="overlayTexto"
+               layoutX="200"
+               layoutY="150"
+               prefWidth="800"
+               prefHeight="200"
+               text="Mensaje"
+               style="-fx-font-size: 48px;
+                      -fx-font-weight: bold;
+                      -fx-text-fill: yellow;
+                      -fx-text-alignment: center;"
+               wrapText="true" />
+
+        <Button text="Cerrar"
+                onAction="#cerrarOverlay"
+                layoutX="500"
+                layoutY="380"
+                prefWidth="200"
+                style="-fx-font-size: 22px;
+                       -fx-font-weight: bold;
+                       -fx-background-color: #ffffff;
+                       -fx-text-fill: #333;" />
+    </AnchorPane>
+
+    <!-- BOTÓN VOLVER AL MENÚ -->
+    <Button text="Volver"
+            onAction="#volverMenu"
+            layoutX="20"
+            layoutY="20"
+            style="-fx-font-size: 20px;
+                   -fx-background-color: #ffffff;
+                   -fx-text-fill: #333;" />
+
+</AnchorPane>
