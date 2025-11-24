@@ -5,9 +5,10 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController">
+<Pane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuController" prefWidth="1920"
+      prefHeight="1080">
 
-    <ImageView fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+    <ImageView fitHeight="1080" fitWidth="1920" pickOnBounds="true" preserveRatio="true">
         <image>
             <Image url="@../img/menuLalala.png" />
         </image>
