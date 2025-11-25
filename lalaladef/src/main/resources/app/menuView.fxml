@@ -20,7 +20,7 @@
          <Image url="@../img/botonSalir.png" />
       </image>
    </ImageView>
-    <Button fx:id="exitButton" layoutX="845.0" layoutY="687.0" onAction="#handleExit" opacity="0.22" prefHeight="153.0" prefWidth="230.0" text="Salir">
+    <Button fx:id="exitButton" layoutX="845.0" layoutY="687.0" onAction="#handleExit" opacity="0.0" prefHeight="153.0" prefWidth="230.0" text="Salir">
       <cursor>
          <Cursor fx:constant="HAND" />
       </cursor></Button>
@@ -29,14 +29,20 @@
          <Image url="@../img/botonJugar.png" />
       </image>
    </ImageView>
-    <Button fx:id="playButton" layoutX="845.0" layoutY="424.0" onAction="#handlePlay" opacity="0.4" prefHeight="130.0" prefWidth="230.0" text="Jugar">
+    <Button fx:id="playButton" layoutX="845.0" layoutY="424.0" onAction="#handlePlay" opacity="0.0" prefHeight="130.0" prefWidth="230.0" text="Jugar">
       <cursor>
          <Cursor fx:constant="HAND" />
       </cursor></Button>
-   <ImageView fitHeight="348.0" fitWidth="776.0" layoutX="563.0" layoutY="106.0" pickOnBounds="true" preserveRatio="true">
+   <ImageView fitHeight="348.0" fitWidth="776.0" layoutX="572.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true">
         <image>
             <Image url="@../menu/cartel.png" />
         </image>
     </ImageView>
+   <ImageView fitHeight="833.0" fitWidth="470.0" layoutX="1210.0" layoutY="247.0" pickOnBounds="true" preserveRatio="true">
+       <image>
+           <Image url="@../lala/LALA_DEPIE.png" />
+       </image>
+   </ImageView>
+
 
 </Pane>
