@@ -22,7 +22,7 @@ public class MenuController {
 
     @FXML
     private void initialize() {
-        player.play("/MUSICA/navgal2.mp3");
+        player.play("/audio/navGal2.mp3");
 
         contentGroup.translateXProperty().bind(
                 Bindings.divide(

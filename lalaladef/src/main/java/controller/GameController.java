@@ -50,7 +50,7 @@ public class GameController {
 
     @FXML
     public void initialize() {
-        player.play("/MUSICA/Navidad Galáctica.mp3");
+        player.play("/audio/navGal.mp3");
         URL url = getClass().getResource("/img/PLANETA_SNIEVE.png");
         if (url == null) {
             System.out.println("❌ No se encontró la imagen del fondo.");
@@ -189,7 +189,7 @@ public class GameController {
         nieveTimeline = new Timeline(new KeyFrame(Duration.millis(250), e -> crearCopo()));
         nieveTimeline.setCycleCount(Animation.INDEFINITE);
         nieveTimeline.play();
-        player.play("/MUSICA/Wally en las Estrellas.mp3");
+        player.play("/audio/WallyEstrellas.mp3");
 
     }
 
