@@ -3,31 +3,51 @@ package controller;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import javafx.beans.binding.Bindings;
 
 import java.io.IOException;
 
 public class MenuController {
 
-    @FXML
-    private Button playButton;
+    @FXML private Button playButton;
+    @FXML private Button exitButton;
+    @FXML private Pane rootPane;
+    @FXML private Pane contentGroup;
 
     @FXML
-    private Button exitButton;
+    private void initialize() {
+        contentGroup.translateXProperty().bind(
+                Bindings.divide(
+                        Bindings.subtract(rootPane.widthProperty(), 1920.0),
+                        2
+                )
+        );
+        contentGroup.translateYProperty().bind(
+                Bindings.divide(
+                        Bindings.subtract(rootPane.heightProperty(), 1080.0),
+                        2
+                )
+        );
 
-    @FXML
-    private Label welcomeText;
+        contentGroup.scaleXProperty().bind(
+                Bindings.min(
+                        Bindings.divide(rootPane.widthProperty(), 1920.0),
+                        Bindings.divide(rootPane.heightProperty(), 1080.0)
+                )
+        );
+        contentGroup.scaleYProperty().bind(contentGroup.scaleXProperty());
+    }
 
     @FXML
     private void handlePlay() {
         try {
+            Stage stage = (Stage) playButton.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/gameView.fxml"));
             Parent gameRoot = loader.load();
-            Stage stage = (Stage) playButton.getScene().getWindow();
-            stage.setScene(new Scene(gameRoot, 400, 300));
+            stage.getScene().setRoot(gameRoot);
         } catch (IOException e) {
             e.printStackTrace();
         }

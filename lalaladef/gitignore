@@ -1,0 +1,17 @@
+# IDE
+.idea/
+*.iml
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
@@ -10,23 +9,18 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controller.GameController"
             fx:id="rootPane"
-            prefWidth="1920"
-            prefHeight="1080">
+            style="-fx-background-color: black;">
 
-    <!-- FONDO PRINCIPAL (zoom + animación) -->
+    <!-- FONDO PRINCIPAL -->
     <ImageView fx:id="fondo"
-               fitWidth="1200"
-               fitHeight="560"
-               preserveRatio="true"
-               pickOnBounds="true"
-               onMouseClicked="#clickImagen"/>
+               preserveRatio="false"
+    pickOnBounds="true"
+    onMouseClicked="#clickImagen"/>
 
     <!-- OVERLAY PARA NIÑOS (mensajes simpáticos) -->
     <AnchorPane fx:id="overlay"
                 style="-fx-background-color: rgba(0,0,0,0.65);"
-                visible="false"
-                prefWidth="1200"
-                prefHeight="560">
+                visible="false">
 
         <Label fx:id="overlayTexto"
                layoutX="200"
@@ -51,13 +45,25 @@
                        -fx-text-fill: #333;" />
     </AnchorPane>
 
-    <!-- BOTÓN VOLVER AL MENÚ -->
-    <Button text="Volver"
+    <!--  BOTÓN VOLVER MEJORADO  -->
+    <Button fx:id="btnVolver"
+            text="🔙 ¡Volver!"
             onAction="#volverMenu"
-            layoutX="20"
-            layoutY="20"
-            style="-fx-font-size: 20px;
-                   -fx-background-color: #ffffff;
-                   -fx-text-fill: #333;" />
+            layoutX="30"
+            layoutY="30"
+            prefWidth="160"
+            prefHeight="50"
+            style="
+                -fx-font-size: 22px;
+                -fx-font-weight: bold;
+                -fx-background-color: linear-gradient(to bottom, #ff9a9e, #fad0c4);
+                -fx-text-fill: #5d4037;
+                -fx-background-radius: 25;
+                -fx-border-color: #ff6b6b;
+                -fx-border-width: 2;
+                -fx-border-radius: 25;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 2, 2);"
+            onMouseEntered="#onHoverEnter"
+            onMouseExited="#onHoverExit" />
 
 </AnchorPane>
