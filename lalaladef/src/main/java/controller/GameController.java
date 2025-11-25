@@ -15,11 +15,13 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import player.MusicPlayer;
 
 import java.net.URL;
 import java.util.Random;
 
 public class GameController {
+    MusicPlayer player= new MusicPlayer();
 
     // ====== NODOS DEL FXML ======
     @FXML
@@ -48,6 +50,7 @@ public class GameController {
 
     @FXML
     public void initialize() {
+        player.play("/MUSICA/Navidad Galáctica.mp3");
         URL url = getClass().getResource("/img/PLANETA_SNIEVE.png");
         if (url == null) {
             System.out.println("❌ No se encontró la imagen del fondo.");
@@ -186,6 +189,8 @@ public class GameController {
         nieveTimeline = new Timeline(new KeyFrame(Duration.millis(250), e -> crearCopo()));
         nieveTimeline.setCycleCount(Animation.INDEFINITE);
         nieveTimeline.play();
+        player.play("/MUSICA/Wally en las Estrellas.mp3");
+
     }
 
     private void crearCopo() {
@@ -212,6 +217,7 @@ public class GameController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/menuView.fxml"));
             Parent menuRoot = loader.load();
             stage.getScene().setRoot(menuRoot);
+            player.stop();
             if (!stage.isFullScreen()) stage.setFullScreen(true);
         } catch (Exception e) {
             e.printStackTrace();

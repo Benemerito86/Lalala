@@ -12,7 +12,6 @@
             fx:id="rootPane"
             style="-fx-background-color: black;">
 
-    <!-- ✅ Grupo escalable (no usa layoutX/Y internamente) -->
     <Pane fx:id="contentGroup"
           prefWidth="1920" prefHeight="1080"
           scaleX="1.0" scaleY="1.0">

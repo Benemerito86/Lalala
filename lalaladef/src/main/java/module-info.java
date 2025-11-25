@@ -3,6 +3,8 @@ module org.example.lalala {
     requires javafx.controls;
     requires javafx.fxml;
     requires com.almasb.fxgl.all;
+    requires java.desktop;
+    requires jlayer;
 
     // Abrimos paquetes para FXML
     opens app to javafx.fxml;
@@ -11,4 +13,5 @@ module org.example.lalala {
     // Exportamos si planeamos usar clases fuera del módulo
     exports app;
     exports controller;
+    exports player;
 }
