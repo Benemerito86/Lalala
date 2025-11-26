@@ -14,7 +14,6 @@ import java.io.IOException;
 public class MenuController {
     MusicPlayer player = new MusicPlayer();
 
-
     @FXML private Button playButton;
     @FXML private Button exitButton;
     @FXML private Pane rootPane;
@@ -24,6 +23,7 @@ public class MenuController {
     private void initialize() {
         player.play("/audio/navGal2.mp3");
 
+        // Mantengo TODO lo vuestro tal cual:
         contentGroup.translateXProperty().bind(
                 Bindings.divide(
                         Bindings.subtract(rootPane.widthProperty(), 1920.0),
@@ -44,6 +44,17 @@ public class MenuController {
                 )
         );
         contentGroup.scaleYProperty().bind(contentGroup.scaleXProperty());
+
+        // 🔥 AÑADIDO: fijar ventana a 1920×1080 cuando entra al menú
+        rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                Stage stage = (Stage) rootPane.getScene().getWindow();
+                stage.setFullScreen(false);
+                stage.setResizable(false);
+                stage.setWidth(1920);
+                stage.setHeight(1080);
+            }
+        });
     }
 
     @FXML
@@ -54,6 +65,13 @@ public class MenuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/gameView.fxml"));
             Parent gameRoot = loader.load();
             stage.getScene().setRoot(gameRoot);
+
+            // 🔥 fijamos tamaño también al entrar al juego
+            stage.setFullScreen(false);
+            stage.setResizable(false);
+            stage.setWidth(1920);
+            stage.setHeight(1080);
+
         } catch (IOException e) {
             e.printStackTrace();
         }

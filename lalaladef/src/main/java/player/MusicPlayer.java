@@ -14,7 +14,6 @@ public class MusicPlayer {
 
     /**
      * Reproduce un MP3 dentro de resources.
-     * @param resourcePath ruta relativa a src/main/resources, ej: "/MUSICA/navGal2.mp3"
      */
     public void play(String resourcePath) {
         stop();

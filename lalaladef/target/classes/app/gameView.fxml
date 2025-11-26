@@ -9,13 +9,21 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controller.GameController"
             fx:id="rootPane"
+            onMouseClicked="#clickImagen"
             style="-fx-background-color: black;">
 
     <!-- FONDO PRINCIPAL -->
     <ImageView fx:id="fondo"
                preserveRatio="false"
-    pickOnBounds="true"
-    onMouseClicked="#clickImagen"/>
+               pickOnBounds="true" />
+
+    <!-- LALA COMO SPRITE INDEPENDIENTE -->
+    <ImageView fx:id="lalaSprite"
+               layoutX="700"
+               layoutY="430"
+               fitWidth="260"
+               preserveRatio="true"
+               pickOnBounds="true" />
 
     <!-- OVERLAY PARA NIÑOS (mensajes simpáticos) -->
     <AnchorPane fx:id="overlay"
