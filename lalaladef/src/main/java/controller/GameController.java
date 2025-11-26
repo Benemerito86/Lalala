@@ -44,7 +44,7 @@ public class GameController {
     private double escalaY = 1.0;
 
     // =======================================
-    // POSICIONES BASE LALA (AJUSTADAS SUAVE)
+    // POSICIONES BASE LALA
     // =======================================
     private final double[] lalaBaseX = {
             1148,  // Fase 0 — LALA_DEPIE
@@ -98,12 +98,13 @@ public class GameController {
     @FXML
     public void initialize() {
 
+        // Música inicial (sin fade por ahora)
         player.play("/audio/navGal.mp3");
 
         // Cargar fondo 3840×2160
         URL url = getClass().getResource("/escenarios/CITY_ONE.png");
         if (url == null) {
-            System.out.println("❌ No se encontró CITY_ONE.png");
+            System.out.println("No se encontró CITY_ONE.png");
             return;
         }
 
@@ -123,9 +124,35 @@ public class GameController {
         lalaSprite.setVisible(false);
 
         cargarImagenCopo();
+
+        // Ocultar botón "Cerrar" viejo, por si queda en el FXML
         overlay.lookupAll("Button").forEach(node -> node.setVisible(false));
 
+        // Fade-in suave de la escena al entrar desde el menú
+        Platform.runLater(this::fadeInScene);
+
+        // Zoom inicial
         Platform.runLater(this::animarZoomInicial);
+    }
+
+    // =======================================
+    // FADE-IN SUAVE DE LA ESCENA
+    // =======================================
+    private void fadeInScene() {
+        AnchorPane blanco = new AnchorPane();
+        blanco.setStyle("-fx-background-color: white;");
+        blanco.setOpacity(1);
+
+        blanco.prefWidthProperty().bind(rootPane.widthProperty());
+        blanco.prefHeightProperty().bind(rootPane.heightProperty());
+
+        rootPane.getChildren().add(blanco);
+
+        FadeTransition ft = new FadeTransition(Duration.seconds(2.5), blanco);
+        ft.setFromValue(1);
+        ft.setToValue(0);
+        ft.setOnFinished(e -> rootPane.getChildren().remove(blanco));
+        ft.play();
     }
 
     // =======================================
@@ -373,7 +400,6 @@ public class GameController {
         double maxY = 0;                   // límite abajo
 
         // Margen de seguridad para NO llegar al borde exacto
-        // (en pixels de pantalla, sin escalar)
         double margenX = 50;
         double margenY = 80;
 
@@ -382,8 +408,6 @@ public class GameController {
         minY += margenY;
         maxY -= margenY;
 
-        // movimiento real con escala + clamp
-        // (movX/movY se pensaron en coords "base", por eso mantenemos el *escalaX / *escalaY)
         double destinoX = clamp(movX * escalaX, minX, maxX);
         double destinoY = clamp(movY * escalaY, minY, maxY);
 
@@ -411,7 +435,7 @@ public class GameController {
     }
 
     // =======================================
-    // NAVIDAD
+    // NAVIDAD — FONDO + LALA + NIEVE
     // =======================================
     private void cambiarAFondoNavideno() {
         if (navidenoActivado) return;
@@ -426,45 +450,44 @@ public class GameController {
             Image nuevoFondo = new Image(urlFondo.toExternalForm());
             Image nuevaLala = new Image(urlLala.toExternalForm());
 
-            // === FADE OUT conjunto ===
-            FadeTransition fadeOutFondo = new FadeTransition(Duration.seconds(0.8), fondo);
-            fadeOutFondo.setToValue(0);
+            // FADE OUT conjunto (hacia blanco)
+            AnchorPane blanco = new AnchorPane();
+            blanco.setStyle("-fx-background-color: white;");
+            blanco.setOpacity(0);
 
-            FadeTransition fadeOutLala = new FadeTransition(Duration.seconds(0.8), lalaSprite);
-            fadeOutLala.setToValue(0);
+            blanco.prefWidthProperty().bind(rootPane.widthProperty());
+            blanco.prefHeightProperty().bind(rootPane.heightProperty());
 
-            ParallelTransition fadeOutGroup =
-                    new ParallelTransition(fadeOutFondo, fadeOutLala);
+            rootPane.getChildren().add(blanco);
 
-            fadeOutGroup.setOnFinished(ev -> {
+            FadeTransition fadeToWhite = new FadeTransition(Duration.seconds(1.2), blanco);
+            fadeToWhite.setFromValue(0);
+            fadeToWhite.setToValue(1);
 
-                // CAMBIO real de imágenes cuando están invisibles
+            fadeToWhite.setOnFinished(ev -> {
+
+                // CAMBIO real de imágenes cuando ya está blanco
                 fondo.setImage(nuevoFondo);
                 lalaSprite.setImage(nuevaLala);
 
-                // Reaplicar opacidad antes del fade in
-                fondo.setOpacity(0);
-                lalaSprite.setOpacity(0);
+                // fade-out del blanco: vuelve a mostrar la escena
+                FadeTransition fadeOutWhite = new FadeTransition(Duration.seconds(1.2), blanco);
+                fadeOutWhite.setFromValue(1);
+                fadeOutWhite.setToValue(0);
 
-                // === FADE IN conjunto ===
-                FadeTransition fadeInFondo = new FadeTransition(Duration.seconds(1.0), fondo);
-                fadeInFondo.setToValue(1);
+                fadeOutWhite.setOnFinished(ev2 -> {
+                    rootPane.getChildren().remove(blanco);
 
-                FadeTransition fadeInLala = new FadeTransition(Duration.seconds(1.0), lalaSprite);
-                fadeInLala.setToValue(1);
-
-                ParallelTransition fadeInGroup =
-                        new ParallelTransition(fadeInFondo, fadeInLala);
-
-                fadeInGroup.setOnFinished(ev2 -> {
-                    // Y al terminar, añadimos NIEVE
+                    // NIEVE + música normal
                     agregarNieve();
+                    player.play("/audio/WallyEstrellas.mp3");
                 });
 
-                fadeInGroup.play();
+                fadeOutWhite.play();
             });
 
-            fadeOutGroup.play();
+            fadeToWhite.play();
+
 
         } catch (Exception ignored) {}
     }
@@ -483,8 +506,6 @@ public class GameController {
         nieveTimeline = new Timeline(new KeyFrame(Duration.millis(300), e -> crearCopo()));
         nieveTimeline.setCycleCount(Animation.INDEFINITE);
         nieveTimeline.play();
-
-        player.play("/audio/WallyEstrellas.mp3");
     }
 
     private void crearCopo() {
@@ -544,7 +565,4 @@ public class GameController {
     private double clamp(double valor, double min, double max) {
         return Math.max(min, Math.min(max, valor));
     }
-
 }
-
-
