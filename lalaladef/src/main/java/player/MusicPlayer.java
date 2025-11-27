@@ -2,19 +2,12 @@ package player;
 
 import javazoom.jl.player.Player;
 
-import javax.sound.sampled.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class MusicPlayer {
     private Player player;
     private Thread playerThread;
 
-    /**
-     * Reproduce un MP3 dentro de resources.
-     */
     public void play(String resourcePath) {
         stop();
 
@@ -38,5 +31,14 @@ public class MusicPlayer {
     public void stop() {
         if (player != null) player.close();
         if (playerThread != null && playerThread.isAlive()) playerThread.interrupt();
+    }
+
+    // =====================================================
+    // NUEVO: REPRODUCTOR GLOBAL
+    // =====================================================
+    private static MusicPlayer globalPlayer = new MusicPlayer();
+
+    public static MusicPlayer getGlobalPlayer() {
+        return globalPlayer;
     }
 }

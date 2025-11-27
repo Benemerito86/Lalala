@@ -22,11 +22,11 @@ import java.util.Random;
 
 public class GameController {
 
-    MusicPlayer player = new MusicPlayer();
+    MusicPlayer player = MusicPlayer.getGlobalPlayer();
 
-    // =======================================
-    // NODOS FXML
-    // =======================================
+    // ============================================================
+    // ELEMENTOS DEL FXML (LO QUE HAY EN ESCENA)
+    // ============================================================
     @FXML private AnchorPane rootPane;
     @FXML private ImageView fondo;
     @FXML private ImageView lalaSprite;
@@ -34,74 +34,57 @@ public class GameController {
     @FXML private Label overlayTexto;
     @FXML private Button btnVolver;
 
-    // =======================================
-    // FONDO REAL — 3840×2160
-    // =======================================
+    // ============================================================
+    // ESCALADO DEL ESCENARIO BASE 3840×2160
+    // ============================================================
     private final double BASE_W = 3840.0;
     private final double BASE_H = 2160.0;
 
     private double escalaX = 1.0;
     private double escalaY = 1.0;
 
-    // =======================================
-    // POSICIONES BASE LALA
-    // =======================================
-    private final double[] lalaBaseX = {
-            1148,  // Fase 0 — LALA_DEPIE
-            1620,  // Fase 1 — PARACAIDAS
-            2564   // Fase 2 — SENTADA
-    };
+    // ============================================================
+    // POSICIONES Y TAMAÑOS BASE DE LALA (las 3 fases)
+    // ============================================================
+    private final double[] lalaBaseX = { 1198, 1620, 2564 };
+    private final double[] lalaBaseY = { 710, 42, 1240 };
 
-    private final double[] lalaBaseY = {
-            720,   // Fase 0
-            42,    // Fase 1
-            1240   // Fase 2
-    };
-
-    // Tamaños BASE
-    private final double[] lalaBaseWidth = {
-            377, // de pie
-            550, // paracaídas
-            670  // sentada
-    };
-
-    private final double[] lalaBaseHeight = {
-            613,
-            673,
-            877
-    };
+    private final double[] lalaBaseWidth  = { 307, 550, 670 };
+    private final double[] lalaBaseHeight = { 543, 673, 877 };
 
     private final String[] lalaSprites = {
-            "/lala/LALA_DEPIE.png",
+            "/lala/LALA_DEPIE2.png",
             "/lala/LALA_PARACAIDAS.png",
             "/lala/LALA_SENTADA.png"
     };
 
     private int faseActual = 0;
 
-    // =======================================
-    // ZOOM INICIAL
-    // =======================================
+    // ============================================================
+    // VALORES PARA EL ZOOM INICIAL
+    // ============================================================
     private double zoomInicial = 1.8;
     private double translateInicialX = -480;
     private double translateInicialY = 0;
 
-    // NAVIDAD
+    // ============================================================
+    // NAVIDAD: estado, nieve, imágenes, aleatorio
+    // ============================================================
     private boolean navidenoActivado = false;
     private Timeline nieveTimeline;
     private final Random random = new Random();
     private Image copoImagen;
 
-    // =======================================
-    // INIT
-    // =======================================
+    // ============================================================
+    // INICIALIZACIÓN PRINCIPAL
+    // ============================================================
     @FXML
     public void initialize() {
 
-        // Música inicial (sin fade por ahora)
+        // Música inicial
         player.play("/audio/navGal.mp3");
 
-        // Cargar fondo 3840×2160
+        // Cargar fondo
         URL url = getClass().getResource("/escenarios/CITY_ONE.png");
         if (url == null) {
             System.out.println("No se encontró CITY_ONE.png");
@@ -111,10 +94,11 @@ public class GameController {
         fondo.setImage(new Image(url.toExternalForm()));
         fondo.setPreserveRatio(false);
 
-        // Fondo adaptado al tamaño del panel
+        // Fondo ajustado al panel
         fondo.fitWidthProperty().bind(rootPane.widthProperty());
         fondo.fitHeightProperty().bind(rootPane.heightProperty());
 
+        // Zoom inicial
         fondo.setScaleX(zoomInicial);
         fondo.setScaleY(zoomInicial);
         fondo.setTranslateX(translateInicialX);
@@ -125,19 +109,19 @@ public class GameController {
 
         cargarImagenCopo();
 
-        // Ocultar botón "Cerrar" viejo, por si queda en el FXML
+        // Ocultar botón viejo
         overlay.lookupAll("Button").forEach(node -> node.setVisible(false));
 
-        // Fade-in suave de la escena al entrar desde el menú
+        // Fade-in de entrada
         Platform.runLater(this::fadeInScene);
 
-        // Zoom inicial
+        // Animación de zoom inicial
         Platform.runLater(this::animarZoomInicial);
     }
 
-    // =======================================
-    // FADE-IN SUAVE DE LA ESCENA
-    // =======================================
+    // ============================================================
+    // FADE BLANCO AL ENTRAR EN ESTA ESCENA
+    // ============================================================
     private void fadeInScene() {
         AnchorPane blanco = new AnchorPane();
         blanco.setStyle("-fx-background-color: white;");
@@ -145,19 +129,18 @@ public class GameController {
 
         blanco.prefWidthProperty().bind(rootPane.widthProperty());
         blanco.prefHeightProperty().bind(rootPane.heightProperty());
-
         rootPane.getChildren().add(blanco);
 
-        FadeTransition ft = new FadeTransition(Duration.seconds(2.5), blanco);
+        FadeTransition ft = new FadeTransition(Duration.seconds(1.5), blanco);
         ft.setFromValue(1);
         ft.setToValue(0);
         ft.setOnFinished(e -> rootPane.getChildren().remove(blanco));
         ft.play();
     }
 
-    // =======================================
-    // ESCALADO POR RESOLUCIÓN
-    // =======================================
+    // ============================================================
+    // ESCALADO AUTOMÁTICO SEGÚN RESOLUCIÓN
+    // ============================================================
     private void actualizarEscala() {
         double w = rootPane.getWidth();
         double h = rootPane.getHeight();
@@ -171,9 +154,9 @@ public class GameController {
         escalaY = h / BASE_H;
     }
 
-    // =======================================
-    // ZOOM INICIAL
-    // =======================================
+    // ============================================================
+    // ZOOM INICIAL DE LA CÁMARA
+    // ============================================================
     private void animarZoomInicial() {
 
         Duration dur = Duration.seconds(12);
@@ -197,18 +180,16 @@ public class GameController {
             fondo.setScaleY(1);
             fondo.setTranslateX(0);
             fondo.setTranslateY(0);
-
             mostrarLalaFase();
         });
 
         pt.play();
     }
 
-    // =======================================
-    // MOSTRAR LALA de forma exacta
-    // =======================================
+    // ============================================================
+    // MOSTRAR LALA SEGÚN LA FASE, CON ANIMACIÓN
+    // ============================================================
     private void mostrarLalaFase() {
-
         actualizarEscala();
 
         try {
@@ -217,18 +198,15 @@ public class GameController {
 
             lalaSprite.setImage(new Image(url.toExternalForm()));
 
-            // Escala extra solo para la Lala sentada (fase 2)
             double extraScale = (faseActual == 2) ? 1.08 : 1.0;
 
-            // Tamaño proporcional REAL
-            lalaSprite.setFitWidth(lalaBaseWidth[faseActual] * escalaX * extraScale);
+            lalaSprite.setFitWidth(lalaBaseWidth[faseActual]  * escalaX * extraScale);
             lalaSprite.setFitHeight(lalaBaseHeight[faseActual] * escalaY * extraScale);
 
-            // Posición real
             lalaSprite.setLayoutX(lalaBaseX[faseActual] * escalaX);
             lalaSprite.setLayoutY(lalaBaseY[faseActual] * escalaY);
 
-            // Animación POP
+            // Animación pop-in
             lalaSprite.setOpacity(0);
             lalaSprite.setScaleX(0.7);
             lalaSprite.setScaleY(0.7);
@@ -249,14 +227,14 @@ public class GameController {
         }
     }
 
-    // =======================================
-    // CLICK
-    // =======================================
+    // ============================================================
+    // CLICK SOBRE LA ESCENA (ACIERTO / FALLO)
+    // ============================================================
     @FXML
     private void clickImagen(MouseEvent e) {
 
         if (lalaSprite != null && lalaSprite.getBoundsInParent().contains(e.getX(), e.getY())) {
-            reproducirSonido("/Audio/aplausos.mp3");
+            reproducirSonido("/Audio/acierto.mp3");
             mostrarAcierto();
         } else {
             reproducirSonido("/Audio/fallo.mp3");
@@ -272,19 +250,17 @@ public class GameController {
         } catch (Exception ignored) {}
     }
 
-    // =======================================
-    // OVERLAY CENTRADO
-    // =======================================
+    // ============================================================
+    // OVERLAY DEL "ACIERTO / FALLO"
+    // ============================================================
     private void mostrarOverlay(boolean esAcierto) {
 
         overlay.setVisible(true);
         overlay.setOpacity(0);
 
-        // El overlay ocupa toda la pantalla
         overlay.prefWidthProperty().bind(rootPane.widthProperty());
         overlay.prefHeightProperty().bind(rootPane.heightProperty());
 
-        // Centramos el texto SIEMPRE
         Platform.runLater(() -> {
             AnchorPane.setTopAnchor(overlayTexto,
                     (rootPane.getHeight() - overlayTexto.getPrefHeight()) / 2 - 40);
@@ -292,19 +268,16 @@ public class GameController {
                     (rootPane.getWidth() - overlayTexto.getPrefWidth()) / 2);
         });
 
-        // Fade IN
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.4), overlay);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
 
         fadeIn.setOnFinished(e -> {
 
-            // Espera de segundos
             PauseTransition espera = new PauseTransition(Duration.seconds(1.6));
 
             espera.setOnFinished(ev -> {
 
-                // Fade OUT
                 FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), overlay);
                 fadeOut.setToValue(0);
 
@@ -312,7 +285,6 @@ public class GameController {
 
                 fadeOut.play();
 
-                // Si fue acierto → avanzar fase después del fade
                 if (esAcierto) {
                     avanzarFase();
                 }
@@ -324,13 +296,11 @@ public class GameController {
         fadeIn.play();
     }
 
-
     private void mostrarAcierto() {
         overlayTexto.setText("🎉 ¡MUY BIEN! 🎉\n¡Encontraste a Lala!");
         overlayTexto.setStyle("-fx-font-size: 56px; -fx-font-weight: bold; -fx-text-fill: #ffe066;");
         mostrarOverlay(true);
     }
-
 
     private void mostrarFallo() {
         overlayTexto.setText("😮 ¡Casi!\n¡Sigue buscando!");
@@ -340,27 +310,22 @@ public class GameController {
 
     @FXML
     private void cerrarOverlay() {
-        // vacío, pero evita que el FXML peten
+        // método vacío para evitar errores por FXML
     }
 
-
-    // =======================================
-    // CAMBIO DE FASE
-    // =======================================
+    // ============================================================
+    // AVANZAR FASE (3 pasos → navidad)
+    // ============================================================
     private void avanzarFase() {
 
         if (faseActual == 0) {
             faseActual = 1;
-
-            // SUBIR A LA LALA DEL PARACAÍDAS
             animarMovimiento(-120, 200, 1.20);
             return;
         }
 
         if (faseActual == 1) {
             faseActual = 2;
-
-            // BAJAR A LA LALA SENTADA
             animarMovimiento(-340, -120, 1.22);
             return;
         }
@@ -368,16 +333,15 @@ public class GameController {
         cambiarAFondoNavideno();
     }
 
-    // =======================================
-    // MOVIMIENTO + ZOOM (CON CLAMPS)
-    // =======================================
+    // ============================================================
+    // MOVIMIENTO DE LA "CÁMARA"
+    // ============================================================
     private void animarMovimiento(double movX, double movY, double zoomFinal) {
 
         actualizarEscala();
 
         Duration dur = Duration.seconds(3);
 
-        // Fade-out de Lala antes de mover la cámara
         if (lalaSprite.isVisible()) {
             FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.3), lalaSprite);
             fadeOut.setFromValue(1);
@@ -389,17 +353,15 @@ public class GameController {
         double pantallaW = rootPane.getWidth();
         double pantallaH = rootPane.getHeight();
 
-        // tamaño del fondo después del zoom final
         double fondoW = pantallaW * zoomFinal;
         double fondoH = pantallaH * zoomFinal;
 
-        double minX = pantallaW - fondoW;  // límite izquierda
-        double maxX = 0;                   // límite derecha
+        double minX = pantallaW - fondoW;
+        double maxX = 0;
 
-        double minY = pantallaH - fondoH;  // límite arriba
-        double maxY = 0;                   // límite abajo
+        double minY = pantallaH - fondoH;
+        double maxY = 0;
 
-        // Margen de seguridad para NO llegar al borde exacto
         double margenX = 50;
         double margenY = 80;
 
@@ -411,7 +373,6 @@ public class GameController {
         double destinoX = clamp(movX * escalaX, minX, maxX);
         double destinoY = clamp(movY * escalaY, minY, maxY);
 
-        // ANIMACIONES DE ZOOM Y TRASLACIÓN
         ScaleTransition st = new ScaleTransition(dur, fondo);
         st.setToX(zoomFinal);
         st.setToY(zoomFinal);
@@ -434,30 +395,29 @@ public class GameController {
         pt.play();
     }
 
-    // =======================================
-    // NAVIDAD — FONDO + LALA + NIEVE
-    // =======================================
+    // ============================================================
+    // NAVIDAD: cambiar fondo + Lala + nieve + activar clic
+    // ============================================================
     private void cambiarAFondoNavideno() {
+
         if (navidenoActivado) return;
         navidenoActivado = true;
 
         try {
             URL urlFondo = getClass().getResource("/escenarios/CITY_ONE_N.png");
-            URL urlLala = getClass().getResource("/lala/LALA_SENTADA_.png");
+            URL urlLala  = getClass().getResource("/lala/LALA_SENTADA_.png");
 
             if (urlFondo == null || urlLala == null) return;
 
             Image nuevoFondo = new Image(urlFondo.toExternalForm());
-            Image nuevaLala = new Image(urlLala.toExternalForm());
+            Image nuevaLala  = new Image(urlLala.toExternalForm());
 
-            // FADE OUT conjunto (hacia blanco)
             AnchorPane blanco = new AnchorPane();
             blanco.setStyle("-fx-background-color: white;");
             blanco.setOpacity(0);
 
             blanco.prefWidthProperty().bind(rootPane.widthProperty());
             blanco.prefHeightProperty().bind(rootPane.heightProperty());
-
             rootPane.getChildren().add(blanco);
 
             FadeTransition fadeToWhite = new FadeTransition(Duration.seconds(1.2), blanco);
@@ -466,21 +426,27 @@ public class GameController {
 
             fadeToWhite.setOnFinished(ev -> {
 
-                // CAMBIO real de imágenes cuando ya está blanco
                 fondo.setImage(nuevoFondo);
                 lalaSprite.setImage(nuevaLala);
 
-                // fade-out del blanco: vuelve a mostrar la escena
                 FadeTransition fadeOutWhite = new FadeTransition(Duration.seconds(1.2), blanco);
                 fadeOutWhite.setFromValue(1);
                 fadeOutWhite.setToValue(0);
 
                 fadeOutWhite.setOnFinished(ev2 -> {
+
                     rootPane.getChildren().remove(blanco);
 
-                    // NIEVE + música normal
                     agregarNieve();
                     player.play("/audio/WallyEstrellas.mp3");
+
+                    rootPane.setPickOnBounds(true);
+                    rootPane.toFront();
+
+                    rootPane.setOnMouseClicked(ev3 -> {
+                        rootPane.setOnMouseClicked(null);
+                        cargarTransicion();
+                    });
                 });
 
                 fadeOutWhite.play();
@@ -488,10 +454,14 @@ public class GameController {
 
             fadeToWhite.play();
 
-
-        } catch (Exception ignored) {}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
+    // ============================================================
+    // NIEVE
+    // ============================================================
     private void cargarImagenCopo() {
         try {
             URL url = getClass().getResource("/img/copo.png");
@@ -503,12 +473,15 @@ public class GameController {
     private void agregarNieve() {
         if (copoImagen == null) return;
 
-        nieveTimeline = new Timeline(new KeyFrame(Duration.millis(300), e -> crearCopo()));
+        nieveTimeline = new Timeline(
+                new KeyFrame(Duration.millis(300), e -> crearCopo())
+        );
         nieveTimeline.setCycleCount(Animation.INDEFINITE);
         nieveTimeline.play();
     }
 
     private void crearCopo() {
+
         ImageView copo = new ImageView(copoImagen);
 
         double esc = 0.4 + random.nextDouble() * 0.6;
@@ -522,15 +495,18 @@ public class GameController {
 
         double finY = rootPane.getHeight() + 80;
 
-        TranslateTransition tt = new TranslateTransition(Duration.seconds(5 + random.nextDouble() * 4), copo);
+        TranslateTransition tt = new TranslateTransition(
+                Duration.seconds(5 + random.nextDouble() * 4),
+                copo
+        );
         tt.setToY(finY);
         tt.setOnFinished(e -> rootPane.getChildren().remove(copo));
         tt.play();
     }
 
-    // =======================================
-    // VOLVER
-    // =======================================
+    // ============================================================
+    // VOLVER AL MENÚ
+    // ============================================================
     @FXML
     private void volverMenu() {
         try {
@@ -561,8 +537,57 @@ public class GameController {
         st.play();
     }
 
-    // LIMITADOR DE MOVIMIENTO PARA NO MOSTRAR BORDES
+    // ============================================================
+    // UTILIDAD: limitar valores
+    // ============================================================
     private double clamp(double valor, double min, double max) {
         return Math.max(min, Math.min(max, valor));
+    }
+
+    // ============================================================
+    // CAMBIO A ESCENA DE TRANSICIÓN
+    // ============================================================
+    private void cargarTransicion() {
+        System.out.println(">>> ENTRANDO en cargarTransicion()");
+
+        AnchorPane blanco = new AnchorPane();
+        blanco.setStyle("-fx-background-color: white;");
+        blanco.setOpacity(0);
+
+        blanco.prefWidthProperty().bind(rootPane.widthProperty());
+        blanco.prefHeightProperty().bind(rootPane.heightProperty());
+        rootPane.getChildren().add(blanco);
+
+        FadeTransition fade = new FadeTransition(Duration.seconds(1.0), blanco);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+
+        fade.setOnFinished(ev -> {
+
+            if (nieveTimeline != null) {
+                nieveTimeline.stop();
+            }
+
+            Platform.runLater(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/transicionView.fxml"));
+                    Parent root = loader.load();
+
+                    Stage stage = (Stage) rootPane.getScene().getWindow();
+                    stage.getScene().setRoot(root);
+
+                    stage.setFullScreen(false);
+                    stage.setResizable(false);
+                    stage.setWidth(1920);
+                    stage.setHeight(1080);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("❌ ERROR cargando transición: " + e.getMessage());
+                }
+            });
+        });
+
+        fade.play();
     }
 }
