@@ -2,6 +2,7 @@
 
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
 
@@ -55,21 +56,22 @@
 
     <!-- BOTÓN VOLVER -->
     <Button fx:id="btnVolver"
-            text="🔙 ¡Volver!"
             onAction="#volverMenu"
             layoutX="30"
             layoutY="30"
-            prefWidth="160"
-            prefHeight="50"
-            style="-fx-font-size: 22px;
-                   -fx-font-weight: bold;
-                   -fx-background-color: linear-gradient(to bottom, #ff9a9e, #fad0c4);
-                   -fx-text-fill: #5d4037;
-                   -fx-background-radius: 25;
-                   -fx-border-color: #ff6b6b;
-                   -fx-border-width: 2;
-                   -fx-border-radius: 25;"
+            prefWidth="80"
+            prefHeight="80"
+            style="-fx-background-color: transparent;
+                   -fx-border-color: transparent;"
             onMouseEntered="#onHoverEnter"
-            onMouseExited="#onHoverExit" />
+            onMouseExited="#onHoverExit">
+        <graphic>
+            <ImageView fitWidth="80" fitHeight="80" preserveRatio="true">
+                <image>
+                    <Image url="@../menu/BotonVolver.png" />
+                </image>
+            </ImageView>
+        </graphic>
+    </Button>
 
 </AnchorPane>
