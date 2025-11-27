@@ -15,6 +15,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.geometry.Pos;
 import player.MusicPlayer;
 
 import java.net.URL;
@@ -254,7 +255,6 @@ public class GameController {
     // OVERLAY DEL "ACIERTO / FALLO"
     // ============================================================
     private void mostrarOverlay(boolean esAcierto) {
-
         overlay.setVisible(true);
         overlay.setOpacity(0);
 
@@ -262,10 +262,19 @@ public class GameController {
         overlay.prefHeightProperty().bind(rootPane.heightProperty());
 
         Platform.runLater(() -> {
-            AnchorPane.setTopAnchor(overlayTexto,
-                    (rootPane.getHeight() - overlayTexto.getPrefHeight()) / 2 - 40);
-            AnchorPane.setLeftAnchor(overlayTexto,
-                    (rootPane.getWidth() - overlayTexto.getPrefWidth()) / 2);
+            // Forzar layout para obtener dimensiones reales
+            overlayTexto.applyCss();
+            overlayTexto.layout();
+
+            double textoAncho = overlayTexto.getWidth();
+            double textoAlto = overlayTexto.getHeight();
+
+            double centerX = (rootPane.getWidth() - textoAncho) / 2.0;
+            double centerY = (rootPane.getHeight() - textoAlto) / 2.0;
+
+            // Centrado preciso (ajuste fino -10px para subir ligeramente)
+            AnchorPane.setLeftAnchor(overlayTexto, centerX);
+            AnchorPane.setTopAnchor(overlayTexto, centerY - 10);
         });
 
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.4), overlay);
@@ -273,23 +282,17 @@ public class GameController {
         fadeIn.setToValue(1);
 
         fadeIn.setOnFinished(e -> {
-
             PauseTransition espera = new PauseTransition(Duration.seconds(1.6));
-
             espera.setOnFinished(ev -> {
-
                 FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), overlay);
                 fadeOut.setToValue(0);
-
                 fadeOut.setOnFinished(ev2 -> overlay.setVisible(false));
-
                 fadeOut.play();
 
                 if (esAcierto) {
                     avanzarFase();
                 }
             });
-
             espera.play();
         });
 
@@ -299,12 +302,14 @@ public class GameController {
     private void mostrarAcierto() {
         overlayTexto.setText("🎉 ¡MUY BIEN! 🎉\n¡Encontraste a Lala!");
         overlayTexto.setStyle("-fx-font-size: 56px; -fx-font-weight: bold; -fx-text-fill: #ffe066;");
+        overlayTexto.setAlignment(Pos.CENTER);
         mostrarOverlay(true);
     }
 
     private void mostrarFallo() {
         overlayTexto.setText("😮 ¡Casi!\n¡Sigue buscando!");
         overlayTexto.setStyle("-fx-font-size: 56px; -fx-font-weight: bold; -fx-text-fill: #ff6b6b;");
+        overlayTexto.setAlignment(Pos.CENTER);
         mostrarOverlay(false);
     }
 
@@ -317,19 +322,16 @@ public class GameController {
     // AVANZAR FASE (3 pasos → navidad)
     // ============================================================
     private void avanzarFase() {
-
         if (faseActual == 0) {
             faseActual = 1;
             animarMovimiento(-120, 200, 1.20);
             return;
         }
-
         if (faseActual == 1) {
             faseActual = 2;
             animarMovimiento(-340, -120, 1.22);
             return;
         }
-
         cambiarAFondoNavideno();
     }
 
@@ -337,7 +339,6 @@ public class GameController {
     // MOVIMIENTO DE LA "CÁMARA"
     // ============================================================
     private void animarMovimiento(double movX, double movY, double zoomFinal) {
-
         actualizarEscala();
 
         Duration dur = Duration.seconds(3);
@@ -358,7 +359,6 @@ public class GameController {
 
         double minX = pantallaW - fondoW;
         double maxX = 0;
-
         double minY = pantallaH - fondoH;
         double maxY = 0;
 
@@ -388,7 +388,6 @@ public class GameController {
             fondo.setScaleY(zoomFinal);
             fondo.setTranslateX(destinoX);
             fondo.setTranslateY(destinoY);
-
             mostrarLalaFase();
         });
 
@@ -399,7 +398,6 @@ public class GameController {
     // NAVIDAD: cambiar fondo + Lala + nieve + activar clic
     // ============================================================
     private void cambiarAFondoNavideno() {
-
         if (navidenoActivado) return;
         navidenoActivado = true;
 
@@ -425,7 +423,6 @@ public class GameController {
             fadeToWhite.setToValue(1);
 
             fadeToWhite.setOnFinished(ev -> {
-
                 fondo.setImage(nuevoFondo);
                 lalaSprite.setImage(nuevaLala);
 
@@ -434,9 +431,7 @@ public class GameController {
                 fadeOutWhite.setToValue(0);
 
                 fadeOutWhite.setOnFinished(ev2 -> {
-
                     rootPane.getChildren().remove(blanco);
-
                     agregarNieve();
                     player.play("/audio/WallyEstrellas.mp3");
 
@@ -448,10 +443,8 @@ public class GameController {
                         cargarTransicion();
                     });
                 });
-
                 fadeOutWhite.play();
             });
-
             fadeToWhite.play();
 
         } catch (Exception ex) {
@@ -481,13 +474,10 @@ public class GameController {
     }
 
     private void crearCopo() {
-
         ImageView copo = new ImageView(copoImagen);
-
         double esc = 0.4 + random.nextDouble() * 0.6;
         copo.setFitWidth(40 * esc);
         copo.setPreserveRatio(true);
-
         copo.setLayoutX(random.nextDouble() * rootPane.getWidth());
         copo.setLayoutY(-50);
 
@@ -563,7 +553,6 @@ public class GameController {
         fade.setToValue(1);
 
         fade.setOnFinished(ev -> {
-
             if (nieveTimeline != null) {
                 nieveTimeline.stop();
             }
