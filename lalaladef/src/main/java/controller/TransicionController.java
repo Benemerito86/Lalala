@@ -32,9 +32,8 @@ public class TransicionController {
     public void initialize() {
         cargarImagenCopo();
 
-        // Esperamos un frame para asegurarnos de que la escena está cargada
         Platform.runLater(() -> {
-            iniciarFadeBlancoInicial();  // <-- aquí va tu método nuevo
+            iniciarFadeBlancoInicial();
         });
     }
 
@@ -43,10 +42,8 @@ public class TransicionController {
     // ============================================================
     private void iniciarFadeBlancoInicial() {
 
-        // 1) PRIMERO colocamos la primera imagen
         setImagen("/escenarios/TRANSICION_REGALOS1.png");
 
-        // 2) Creamos la capa blanca ENCIMA
         AnchorPane blanco = new AnchorPane();
         blanco.setStyle("-fx-background-color: white;");
         blanco.setOpacity(1);
@@ -54,17 +51,14 @@ public class TransicionController {
         blanco.prefWidthProperty().bind(rootPane.widthProperty());
         blanco.prefHeightProperty().bind(rootPane.heightProperty());
         rootPane.getChildren().add(blanco);
-        blanco.toFront(); // muy importante
+        blanco.toFront();
 
-        // 3) HACEMOS EL FADE
         FadeTransition fadeOut = new FadeTransition(Duration.seconds(1.4), blanco);
         fadeOut.setFromValue(1);
         fadeOut.setToValue(0);
 
         fadeOut.setOnFinished(e -> {
             rootPane.getChildren().remove(blanco);
-
-            // Ahora sí activo nieve y transición
             agregarNieve();
             iniciarTransicionImagenes();
         });
@@ -80,11 +74,7 @@ public class TransicionController {
         setImagen("/escenarios/TRANSICION_REGALOS1.png");
 
         PauseTransition pausa = new PauseTransition(DURACION_IMAGEN);
-
-        pausa.setOnFinished(ev -> {
-            crossfadeImagen("/escenarios/TRANSICION_REGALOS2.png");
-        });
-
+        pausa.setOnFinished(ev -> crossfadeImagen("/escenarios/TRANSICION_REGALOS2.png"));
         pausa.play();
     }
 
@@ -97,7 +87,7 @@ public class TransicionController {
     }
 
     // ============================================================
-    // CROSSFADE SUAVE ENTRE IMÁGENES
+    // CROSSFADE SUAVE — corregido (sin micro-flash)
     // ============================================================
     private void crossfadeImagen(String nuevaRuta) {
 
@@ -121,14 +111,16 @@ public class TransicionController {
 
         fadeIn.setOnFinished(e -> {
 
-            imagenTransicion.setImage(nueva.getImage());
-            rootPane.getChildren().remove(nueva);
+            // 🔥 Evita el FLASH
+            imagenTransicion.setOpacity(0);      // Ocultar la anterior
+            imagenTransicion.setImage(nueva.getImage());  // Cambiar imagen
+            rootPane.getChildren().remove(nueva);         // Quitar capa superior
+            imagenTransicion.setOpacity(1);      // Mostrar imagen ya cambiada
 
             PauseTransition espera = new PauseTransition(Duration.seconds(1.5));
             espera.setOnFinished(ev -> cargarLagoNevado());
             espera.play();
         });
-
 
         fadeIn.play();
     }
@@ -178,38 +170,54 @@ public class TransicionController {
     }
 
     // ============================================================
-    // TRANSICION A ESCENA 2
+    // TRANSICION A ESCENA 2 (lago)
     // ============================================================
     private void cargarLagoNevado() {
 
+        // 1) Overlay blanco completamente OPACO desde el inicio (cubre cualquier frame)
         AnchorPane blanco = new AnchorPane();
         blanco.setStyle("-fx-background-color: white;");
-        blanco.setOpacity(0);
+        blanco.setOpacity(1);  // <-- ANTES era 0 (causaba el flash)
 
         blanco.prefWidthProperty().bind(rootPane.widthProperty());
         blanco.prefHeightProperty().bind(rootPane.heightProperty());
         rootPane.getChildren().add(blanco);
+        blanco.toFront();
 
-        FadeTransition ft = new FadeTransition(Duration.seconds(1.0), blanco);
-        ft.setFromValue(0);
-        ft.setToValue(1);
+        // 2) Micro-delay para asegurar que el blanco ya ha sido renderizado
+        PauseTransition delay = new PauseTransition(Duration.seconds(0.02));
+        delay.setOnFinished(d -> {
 
-        ft.setOnFinished(e -> {
-
-            // 🔥 Cortamos la música anterior
+            // 3) Ahora sí, cargamos la nueva escena SIN FLICKER
             MusicPlayer.getGlobalPlayer().stop();
 
-            // Cargar escena del lago
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/lagoView.fxml"));
                 Parent root = loader.load();
+
                 rootPane.getScene().setRoot(root);
+
+                // 4) Fade-out del blanco dentro de la nueva escena
+                AnchorPane blanco2 = new AnchorPane();
+                blanco2.setStyle("-fx-background-color: white;");
+                blanco2.setOpacity(1);
+
+                ((AnchorPane) root).getChildren().add(blanco2);
+
+                FadeTransition fadeOut = new FadeTransition(Duration.seconds(1.0), blanco2);
+                fadeOut.setFromValue(1);
+                fadeOut.setToValue(0);
+
+                fadeOut.setOnFinished(e2 -> ((AnchorPane) root).getChildren().remove(blanco2));
+                fadeOut.play();
+
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
 
-        ft.play();
+        delay.play();
     }
+
 
 }

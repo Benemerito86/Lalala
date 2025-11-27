@@ -590,4 +590,9 @@ public class GameController {
 
         fade.play();
     }
+
+    public void reiniciarMusica() {
+        player.play("/audio/navGal.mp3");
+    }
+
 }

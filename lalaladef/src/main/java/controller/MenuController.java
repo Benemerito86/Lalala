@@ -12,6 +12,7 @@ import player.MusicPlayer;
 import java.io.IOException;
 
 public class MenuController {
+
     MusicPlayer player = new MusicPlayer();
 
     @FXML private Button playButton;
@@ -21,15 +22,18 @@ public class MenuController {
 
     @FXML
     private void initialize() {
+
+        // 🎵 Música del menú
         player.play("/audio/navGal2.mp3");
 
-        // Mantengo TODO lo vuestro tal cual:
+        // 📌 Centramos y escalamos el contentGroup como ya teníais
         contentGroup.translateXProperty().bind(
                 Bindings.divide(
                         Bindings.subtract(rootPane.widthProperty(), 1920.0),
                         2
                 )
         );
+
         contentGroup.translateYProperty().bind(
                 Bindings.divide(
                         Bindings.subtract(rootPane.heightProperty(), 1080.0),
@@ -43,30 +47,26 @@ public class MenuController {
                         Bindings.divide(rootPane.heightProperty(), 1080.0)
                 )
         );
+
         contentGroup.scaleYProperty().bind(contentGroup.scaleXProperty());
 
-        // 🔥 AÑADIDO: fijar ventana a 1920×1080 cuando entra al menú
-        rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                Stage stage = (Stage) rootPane.getScene().getWindow();
-                stage.setFullScreen(false);
-                stage.setResizable(false);
-                stage.setWidth(1920);
-                stage.setHeight(1080);
-            }
-        });
+        // ❌ ELIMINADO:
+        // ya no ajustamos tamaño aquí, lo hace Main antes del show()
     }
 
     @FXML
     private void handlePlay() {
         try {
             player.stop();
+
             Stage stage = (Stage) playButton.getScene().getWindow();
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/gameView.fxml"));
             Parent gameRoot = loader.load();
+
             stage.getScene().setRoot(gameRoot);
 
-            // 🔥 fijamos tamaño también al entrar al juego
+            // Mantener tamaño fijo también al entrar en el juego
             stage.setFullScreen(false);
             stage.setResizable(false);
             stage.setWidth(1920);

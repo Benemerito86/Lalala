@@ -46,11 +46,11 @@ public class LagoController {
     // ============================================================
     // DATOS DE LALA (tres fases)
     // ============================================================
-    private final double[] lalaBaseX = { 1000, 2850, 1264 };
-    private final double[] lalaBaseY = { 910, 900, 1500 };
+    private final double[] lalaBaseX = { 1000, 2910, 1264 };
+    private final double[] lalaBaseY = { 910, 930, 1500 };
 
-    private final double[] lalaBaseWidth  = { 307, 330, 570 };
-    private final double[] lalaBaseHeight = { 543, 453, 777 };
+    private final double[] lalaBaseWidth  = { 307, 320, 570 };
+    private final double[] lalaBaseHeight = { 543, 443, 777 };
 
     private final String[] lalaSprites = {
             "/lala/LALA_HORIZONTE.png",
@@ -116,21 +116,48 @@ public class LagoController {
     // ============================================================
     // FADE-IN BLANCO
     // ============================================================
+    // ============================================================
+// FADE-IN BLANCO (sin microcorte, igual que la transición)
+// ============================================================
     private void fadeInScene() {
 
+        // ============================================================
+        // 1) Crear panel blanco ANTES de que JavaFX pinte nada
+        // ============================================================
         AnchorPane blanco = new AnchorPane();
         blanco.setStyle("-fx-background-color: white;");
         blanco.setOpacity(1);
 
         blanco.prefWidthProperty().bind(rootPane.widthProperty());
         blanco.prefHeightProperty().bind(rootPane.heightProperty());
-        rootPane.getChildren().add(blanco);
 
-        FadeTransition ft = new FadeTransition(Duration.seconds(1.5), blanco);
-        ft.setFromValue(1);
-        ft.setToValue(0);
-        ft.setOnFinished(e -> rootPane.getChildren().remove(blanco));
-        ft.play();
+        // Lo añadimos ya, ANTES del primer render
+        rootPane.getChildren().add(blanco);
+        blanco.toFront();
+
+        // ============================================================
+        // 2) Micro-delay para evitar frame negro del render inicial
+        // ============================================================
+        PauseTransition microDelay = new PauseTransition(Duration.seconds(0.02));
+
+        microDelay.setOnFinished(ev -> {
+
+            // ============================================================
+            // 3) Fade-out del blanco → revela la escena suavemente
+            // ============================================================
+            FadeTransition fadeOut = new FadeTransition(Duration.seconds(1.4), blanco);
+            fadeOut.setFromValue(1);
+            fadeOut.setToValue(0);
+
+            fadeOut.setOnFinished(e -> {
+                // quitar overlay blanco al terminar
+                rootPane.getChildren().remove(blanco);
+            });
+
+            fadeOut.play();
+        });
+
+        microDelay.play();
     }
 
     // ============================================================
@@ -321,8 +348,10 @@ public class LagoController {
             return;
         }
 
-        cambiarAFondoNavideno();
+        // 👉 Ya no hay navidad ni nada: simplemente final
+        finalizarYVolverMenu();
     }
+
 
     // ============================================================
     // MOVIMIENTO DE CÁMARA
@@ -386,68 +415,50 @@ public class LagoController {
     }
 
     // ============================================================
-    // FONDO + LALA + NIEVE NAVIDAD
+    // VOLVER AL MENÚ CUANDO TERMINE
     // ============================================================
-    private void cambiarAFondoNavideno() {
+    private void finalizarYVolverMenu() {
 
-        if (navidenoActivado) return;
-        navidenoActivado = true;
+        // 1) Crear panel blanco para fundir
+        AnchorPane blanco = new AnchorPane();
+        blanco.setStyle("-fx-background-color: white;");
+        blanco.setOpacity(0);
 
-        try {
-            URL urlFondo = getClass().getResource("/escenarios/CITY_ONE_N.png");
-            URL urlLala  = getClass().getResource("/lala/LALA_SENTADA_.png");
+        blanco.prefWidthProperty().bind(rootPane.widthProperty());
+        blanco.prefHeightProperty().bind(rootPane.heightProperty());
+        rootPane.getChildren().add(blanco);
+        blanco.toFront();
 
-            if (urlFondo == null || urlLala == null) return;
+        // 2) Fade a blanco suave
+        FadeTransition fade = new FadeTransition(Duration.seconds(1.2), blanco);
+        fade.setFromValue(0);
+        fade.setToValue(1);
 
-            Image nuevoFondo = new Image(urlFondo.toExternalForm());
-            Image nuevaLala  = new Image(urlLala.toExternalForm());
+        fade.setOnFinished(e -> {
 
-            AnchorPane blanco = new AnchorPane();
-            blanco.setStyle("-fx-background-color: white;");
-            blanco.setOpacity(0);
+            // cortar música del lago
+            player.stop();
 
-            blanco.prefWidthProperty().bind(rootPane.widthProperty());
-            blanco.prefHeightProperty().bind(rootPane.heightProperty());
-            rootPane.getChildren().add(blanco);
+            // ir al menú
+            try {
+                Stage stage = (Stage) rootPane.getScene().getWindow();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/menuView.fxml"));
+                Parent menuRoot = loader.load();
+                stage.getScene().setRoot(menuRoot);
 
-            FadeTransition fadeToWhite = new FadeTransition(Duration.seconds(1.2), blanco);
-            fadeToWhite.setFromValue(0);
-            fadeToWhite.setToValue(1);
+                stage.setFullScreen(false);
+                stage.setResizable(false);
+                stage.setWidth(1920);
+                stage.setHeight(1080);
 
-            fadeToWhite.setOnFinished(ev -> {
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
-                fondo.setImage(nuevoFondo);
-                lalaSprite.setImage(nuevaLala);
-
-                FadeTransition fadeOutWhite = new FadeTransition(Duration.seconds(1.2), blanco);
-                fadeOutWhite.setFromValue(1);
-                fadeOutWhite.setToValue(0);
-
-                fadeOutWhite.setOnFinished(ev2 -> {
-
-                    rootPane.getChildren().remove(blanco);
-
-                    agregarNieve();
-                    player.play("/audio/WallyEstrellas2.mp3");
-
-                    rootPane.setPickOnBounds(true);
-                    rootPane.toFront();
-
-                    rootPane.setOnMouseClicked(ev3 -> {
-                        rootPane.setOnMouseClicked(null);
-                        cargarTransicion();
-                    });
-                });
-
-                fadeOutWhite.play();
-            });
-
-            fadeToWhite.play();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        fade.play();
     }
+
 
     // ============================================================
     // NIEVE
@@ -501,15 +512,29 @@ public class LagoController {
     private void volverMenu() {
         try {
             Stage stage = (Stage) rootPane.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/menuView.fxml"));
-            Parent menuRoot = loader.load();
-            stage.getScene().setRoot(menuRoot);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/gameView.fxml"));
+            Parent gameRoot = loader.load();
+
+            stage.getScene().setRoot(gameRoot);
+
+            // ⬅️ Cortamos música del lago
             player.stop();
-            if (!stage.isFullScreen()) stage.setFullScreen(true);
+
+            // ⬅️ Arrancamos la música de la escena 1
+            GameController controller = loader.getController();
+            controller.reiniciarMusica();
+
+            stage.setFullScreen(false);
+            stage.setResizable(false);
+            stage.setWidth(1920);
+            stage.setHeight(1080);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
     @FXML
     private void onHoverEnter(MouseEvent e) {
