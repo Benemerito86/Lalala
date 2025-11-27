@@ -256,10 +256,10 @@ public class LagoController {
     private void clickImagen(MouseEvent e) {
 
         if (lalaSprite != null && lalaSprite.getBoundsInParent().contains(e.getX(), e.getY())) {
-            reproducirSonido("/Audio/acierto.mp3");
+            reproducirSonido("/audio/acierto.mp3");
             mostrarAcierto();
         } else {
-            reproducirSonido("/Audio/fallo.mp3");
+            reproducirSonido("/audio/fallo.mp3");
             mostrarFallo();
         }
     }
