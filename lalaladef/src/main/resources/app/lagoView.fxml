@@ -32,29 +32,30 @@
                 visible="false">
 
         <Label fx:id="overlayTexto"
-               layoutX="200"
-               layoutY="150"
                prefWidth="800"
-               prefHeight="200"
+               prefHeight="240"
                text="Mensaje"
-               style="-fx-font-size: 48px;
-                      -fx-font-weight: bold;
-                      -fx-text-fill: yellow;
-                      -fx-text-alignment: center;"
-               wrapText="true" />
+               wrapText="true"
+               style="
+                   -fx-font-size: 56px;
+                   -fx-font-weight: bold;
+                   -fx-text-fill: yellow;
+                   -fx-text-alignment: center;
+                   -fx-alignment: center;" />
 
+        <!-- Botón Cerrar (oculto, ya que no se usa en el flujo) -->
         <Button text="Cerrar"
                 onAction="#cerrarOverlay"
-                layoutX="500"
-                layoutY="380"
+                layoutX="500" layoutY="380"
                 prefWidth="200"
+                visible="false"
                 style="-fx-font-size: 22px;
                        -fx-font-weight: bold;
-                       -fx-background-color: #ffffff;
+                       -fx-background-color: white;
                        -fx-text-fill: #333;" />
     </AnchorPane>
 
-    <!-- BOTÓN VOLVER -->
+    <!-- BOTÓN VOLVER CON IMAGEN -->
     <Button fx:id="btnVolver"
             onAction="#volverMenu"
             layoutX="30"

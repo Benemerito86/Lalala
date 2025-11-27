@@ -15,6 +15,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.geometry.Pos; // ✅ AÑADIDO
 import player.MusicPlayer;
 
 import java.net.URL;
@@ -114,16 +115,10 @@ public class LagoController {
     }
 
     // ============================================================
-    // FADE-IN BLANCO
+    // FADE-IN BLANCO (sin microcorte, igual que la transición)
     // ============================================================
-    // ============================================================
-// FADE-IN BLANCO (sin microcorte, igual que la transición)
-// ============================================================
     private void fadeInScene() {
 
-        // ============================================================
-        // 1) Crear panel blanco ANTES de que JavaFX pinte nada
-        // ============================================================
         AnchorPane blanco = new AnchorPane();
         blanco.setStyle("-fx-background-color: white;");
         blanco.setOpacity(1);
@@ -131,29 +126,18 @@ public class LagoController {
         blanco.prefWidthProperty().bind(rootPane.widthProperty());
         blanco.prefHeightProperty().bind(rootPane.heightProperty());
 
-        // Lo añadimos ya, ANTES del primer render
         rootPane.getChildren().add(blanco);
         blanco.toFront();
 
-        // ============================================================
-        // 2) Micro-delay para evitar frame negro del render inicial
-        // ============================================================
         PauseTransition microDelay = new PauseTransition(Duration.seconds(0.02));
 
         microDelay.setOnFinished(ev -> {
-
-            // ============================================================
-            // 3) Fade-out del blanco → revela la escena suavemente
-            // ============================================================
             FadeTransition fadeOut = new FadeTransition(Duration.seconds(1.4), blanco);
             fadeOut.setFromValue(1);
             fadeOut.setToValue(0);
-
             fadeOut.setOnFinished(e -> {
-                // quitar overlay blanco al terminar
                 rootPane.getChildren().remove(blanco);
             });
-
             fadeOut.play();
         });
 
@@ -284,10 +268,19 @@ public class LagoController {
         overlay.prefHeightProperty().bind(rootPane.heightProperty());
 
         Platform.runLater(() -> {
-            AnchorPane.setTopAnchor(overlayTexto,
-                    (rootPane.getHeight() - overlayTexto.getPrefHeight()) / 2 - 40);
-            AnchorPane.setLeftAnchor(overlayTexto,
-                    (rootPane.getWidth() - overlayTexto.getPrefWidth()) / 2);
+            // Forzar layout para obtener dimensiones reales del texto
+            overlayTexto.applyCss();
+            overlayTexto.layout();
+
+            double textoAncho = overlayTexto.getWidth();
+            double textoAlto = overlayTexto.getHeight();
+
+            double centerX = (rootPane.getWidth() - textoAncho) / 2.0;
+            double centerY = (rootPane.getHeight() - textoAlto) / 2.0;
+
+            // Centrado preciso
+            AnchorPane.setLeftAnchor(overlayTexto, centerX);
+            AnchorPane.setTopAnchor(overlayTexto, centerY - 10);
         });
 
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.4), overlay);
@@ -295,21 +288,15 @@ public class LagoController {
         fadeIn.setToValue(1);
 
         fadeIn.setOnFinished(e -> {
-
             PauseTransition espera = new PauseTransition(Duration.seconds(1.6));
-
             espera.setOnFinished(ev -> {
-
                 FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), overlay);
                 fadeOut.setToValue(0);
-
                 fadeOut.setOnFinished(ev2 -> overlay.setVisible(false));
-
                 fadeOut.play();
 
                 if (esAcierto) avanzarFase();
             });
-
             espera.play();
         });
 
@@ -319,12 +306,14 @@ public class LagoController {
     private void mostrarAcierto() {
         overlayTexto.setText("🎉 ¡MUY BIEN! 🎉\n¡Encontraste a Lala!");
         overlayTexto.setStyle("-fx-font-size: 56px; -fx-font-weight: bold; -fx-text-fill: #ffe066;");
+        overlayTexto.setAlignment(Pos.CENTER);
         mostrarOverlay(true);
     }
 
     private void mostrarFallo() {
         overlayTexto.setText("😮 ¡Casi!\n¡Sigue buscando!");
         overlayTexto.setStyle("-fx-font-size: 56px; -fx-font-weight: bold; -fx-text-fill: #ff6b6b;");
+        overlayTexto.setAlignment(Pos.CENTER);
         mostrarOverlay(false);
     }
 
@@ -332,7 +321,7 @@ public class LagoController {
     private void cerrarOverlay() { }
 
     // ============================================================
-    // AVANZAR FASE (misma lógica)
+    // AVANZAR FASE
     // ============================================================
     private void avanzarFase() {
 
@@ -348,10 +337,8 @@ public class LagoController {
             return;
         }
 
-        // 👉 Ya no hay navidad ni nada: simplemente final
         finalizarYVolverMenu();
     }
-
 
     // ============================================================
     // MOVIMIENTO DE CÁMARA
@@ -378,7 +365,6 @@ public class LagoController {
 
         double minX = pantallaW - fondoW;
         double maxX = 0;
-
         double minY = pantallaH - fondoH;
         double maxY = 0;
 
@@ -419,7 +405,6 @@ public class LagoController {
     // ============================================================
     private void finalizarYVolverMenu() {
 
-        // 1) Crear panel blanco para fundir
         AnchorPane blanco = new AnchorPane();
         blanco.setStyle("-fx-background-color: white;");
         blanco.setOpacity(0);
@@ -429,17 +414,12 @@ public class LagoController {
         rootPane.getChildren().add(blanco);
         blanco.toFront();
 
-        // 2) Fade a blanco suave
         FadeTransition fade = new FadeTransition(Duration.seconds(1.2), blanco);
         fade.setFromValue(0);
         fade.setToValue(1);
 
         fade.setOnFinished(e -> {
-
-            // cortar música del lago
             player.stop();
-
-            // ir al menú
             try {
                 Stage stage = (Stage) rootPane.getScene().getWindow();
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/menuView.fxml"));
@@ -458,7 +438,6 @@ public class LagoController {
 
         fade.play();
     }
-
 
     // ============================================================
     // NIEVE
@@ -506,7 +485,7 @@ public class LagoController {
     }
 
     // ============================================================
-    // VOLVER AL MENÚ
+    // VOLVER AL MENÚ (vuelve a gameView, no a menuView)
     // ============================================================
     @FXML
     private void volverMenu() {
@@ -517,10 +496,7 @@ public class LagoController {
 
             stage.getScene().setRoot(gameRoot);
 
-            // ⬅️ Cortamos música del lago
             player.stop();
-
-            // ⬅️ Arrancamos la música de la escena 1
             GameController controller = loader.getController();
             controller.reiniciarMusica();
 
@@ -533,8 +509,6 @@ public class LagoController {
             e.printStackTrace();
         }
     }
-
-
 
     @FXML
     private void onHoverEnter(MouseEvent e) {
